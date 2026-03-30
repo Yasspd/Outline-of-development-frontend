@@ -1,0 +1,72 @@
+@import "tailwindcss";
+
+:root {
+  --canvas: #f3f5f7;
+  --panel: #ffffff;
+  --panel-muted: #f7f8fa;
+  --foreground: #111827;
+  --muted: #6b7280;
+  --muted-foreground: #94a3b8;
+  --border: #d8dee6;
+  --accent: #23303f;
+  --accent-soft: #e8edf2;
+  --success: #2f6b4f;
+  --success-soft: #e9f5ee;
+  --warning: #94652d;
+  --warning-soft: #fbf4e8;
+  --danger: #9b3c3c;
+  --danger-soft: #faecec;
+  --info: #315b85;
+  --info-soft: #ebf2f8;
+  --ring: #5f7185;
+}
+
+@theme inline {
+  --font-sans: var(--font-ibm-plex-sans);
+  --color-canvas: var(--canvas);
+  --color-panel: var(--panel);
+  --color-panel-muted: var(--panel-muted);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-warning: var(--warning);
+  --color-warning-soft: var(--warning-soft);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-info: var(--info);
+  --color-info-soft: var(--info-soft);
+  --color-ring: var(--ring);
+}
+
+* {
+  @apply border-border;
+}
+
+html {
+  @apply bg-canvas;
+}
+
+body {
+  @apply min-h-screen bg-canvas text-foreground;
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--muted);
+}
+
+::selection {
+  background: rgba(35, 48, 63, 0.14);
+}
+
