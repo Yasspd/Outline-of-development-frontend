@@ -10,13 +10,14 @@ export function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="w-full shrink-0 border-b border-border bg-panel px-5 py-5 lg:sticky lg:top-0 lg:h-screen lg:w-72 lg:border-b-0 lg:border-r">
-      <div className="mb-8">
-        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted">
-          Контур развития
+    <aside className="w-full shrink-0 border-b border-border bg-panel/95 px-5 py-5 backdrop-blur-sm lg:sticky lg:top-0 lg:h-screen lg:w-[18.5rem] lg:border-b-0 lg:border-r">
+      <div className="mb-8 rounded-[28px] border border-border bg-panel px-5 py-5">
+        <div className="alrosa-rule mb-4" />
+        <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-muted">
+          ALROSA IT
         </p>
-        <h1 className="mt-3 text-2xl font-semibold tracking-tight text-foreground">
-          Learning Workspace
+        <h1 className="mt-3 text-[1.7rem] font-semibold tracking-tight text-foreground">
+          Контур развития
         </h1>
         <p className="mt-2 text-sm leading-6 text-muted">
           Единая рабочая среда обучения, заявок и развития сотрудников.
@@ -34,14 +35,23 @@ export function Sidebar() {
               key={item.href}
               href={item.href}
               className={cn(
-                'min-w-[180px] rounded-xl border border-transparent px-4 py-3 transition-colors lg:min-w-0',
+                'relative min-w-[180px] rounded-[22px] border px-4 py-3.5 transition-colors lg:min-w-0',
                 isActive
-                  ? 'border-border bg-accent-soft text-accent'
-                  : 'text-muted hover:bg-panel-muted hover:text-foreground',
+                  ? 'border-brand-red/20 bg-panel-subtle text-foreground'
+                  : 'border-transparent text-muted hover:border-brand-blue/25 hover:bg-panel hover:text-foreground',
               )}
             >
-              <div className="text-sm font-medium">{item.label}</div>
-              <div className="mt-1 hidden text-xs leading-5 lg:block">{item.description}</div>
+              {isActive ? (
+                <span className="pointer-events-none absolute inset-y-3 left-3 hidden w-4 lg:block">
+                  <span className="absolute left-1 top-0 h-1.5 w-1.5 rounded-full border border-brand-red bg-panel" />
+                  <span className="absolute bottom-0 left-1 h-1.5 w-1.5 rounded-full border border-brand-red bg-panel" />
+                  <span className="absolute bottom-2 top-2 left-[0.42rem] w-px bg-brand-red" />
+                </span>
+              ) : null}
+              <div className={cn('space-y-1', isActive ? 'lg:pl-5' : undefined)}>
+                <div className="text-sm font-medium">{item.label}</div>
+                <div className="hidden text-xs leading-5 lg:block">{item.description}</div>
+              </div>
             </Link>
           );
         })}
@@ -49,4 +59,3 @@ export function Sidebar() {
     </aside>
   );
 }
-

@@ -9,7 +9,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
     <input
       ref={ref}
       className={cn(
-        'flex h-11 w-full rounded-xl border border-border bg-panel px-4 text-sm text-foreground outline-none transition-shadow placeholder:text-muted focus:border-ring focus:ring-2 focus:ring-ring/15',
+        'flex h-11 w-full rounded-2xl border border-border bg-panel px-4 text-sm text-foreground outline-none transition-colors placeholder:text-muted focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/15',
         className,
       )}
       {...props}
@@ -18,4 +18,3 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
 );
 
 Input.displayName = 'Input';
-

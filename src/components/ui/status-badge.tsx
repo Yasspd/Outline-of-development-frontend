@@ -3,11 +3,19 @@ import { ReactNode } from 'react';
 import { cn } from '@/lib/cn';
 
 const toneMap = {
-  neutral: 'bg-panel-muted text-muted',
-  info: 'bg-info-soft text-info',
-  success: 'bg-success-soft text-success',
-  warning: 'bg-warning-soft text-warning',
-  danger: 'bg-danger-soft text-danger',
+  neutral: 'border-border bg-panel-subtle text-muted',
+  info: 'border-brand-blue/40 bg-info-soft text-info',
+  success: 'border-success/20 bg-success-soft text-success',
+  warning: 'border-brand-red/15 bg-warning-soft text-warning',
+  danger: 'border-brand-red/20 bg-danger-soft text-danger',
+} as const;
+
+const dotMap = {
+  neutral: 'bg-muted-foreground',
+  info: 'bg-brand-blue',
+  success: 'bg-success',
+  warning: 'bg-warning',
+  danger: 'bg-danger',
 } as const;
 
 export type StatusTone = keyof typeof toneMap;
@@ -24,13 +32,13 @@ export function StatusBadge({
   return (
     <span
       className={cn(
-        'inline-flex items-center rounded-full px-3 py-1 text-xs font-medium tracking-wide',
+        'inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.12em]',
         toneMap[tone],
         className,
       )}
     >
+      <span className={cn('h-1.5 w-1.5 rounded-full', dotMap[tone])} />
       {children}
     </span>
   );
 }
-

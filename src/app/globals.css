@@ -1,37 +1,47 @@
 @import "tailwindcss";
 
 :root {
-  --canvas: #f3f5f7;
+  --canvas: #f7f9fb;
   --panel: #ffffff;
-  --panel-muted: #f7f8fa;
-  --foreground: #111827;
-  --muted: #6b7280;
-  --muted-foreground: #94a3b8;
-  --border: #d8dee6;
-  --accent: #23303f;
-  --accent-soft: #e8edf2;
-  --success: #2f6b4f;
-  --success-soft: #e9f5ee;
-  --warning: #94652d;
-  --warning-soft: #fbf4e8;
-  --danger: #9b3c3c;
-  --danger-soft: #faecec;
-  --info: #315b85;
-  --info-soft: #ebf2f8;
-  --ring: #5f7185;
+  --panel-muted: #f8fbfd;
+  --panel-subtle: #f1f6fa;
+  --foreground: #101214;
+  --muted: #5b6470;
+  --muted-foreground: #8a94a3;
+  --border: #d9e1e8;
+  --accent: #000000;
+  --accent-soft: #edf2f6;
+  --brand-red: #e3000b;
+  --brand-red-soft: #fff1f2;
+  --brand-blue: #81d0f5;
+  --brand-blue-soft: #eef9ff;
+  --success: #277654;
+  --success-soft: #eef8f2;
+  --warning: #b14c34;
+  --warning-soft: #fff4ef;
+  --danger: #e3000b;
+  --danger-soft: #fff1f2;
+  --info: #2a6d8d;
+  --info-soft: #eef9ff;
+  --ring: rgba(129, 208, 245, 0.55);
 }
 
 @theme inline {
-  --font-sans: var(--font-ibm-plex-sans);
+  --font-sans: "Avenir Next Cyrillic", "Avenir Next", Arial, sans-serif;
   --color-canvas: var(--canvas);
   --color-panel: var(--panel);
   --color-panel-muted: var(--panel-muted);
+  --color-panel-subtle: var(--panel-subtle);
   --color-foreground: var(--foreground);
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
   --color-border: var(--border);
   --color-accent: var(--accent);
   --color-accent-soft: var(--accent-soft);
+  --color-brand-red: var(--brand-red);
+  --color-brand-red-soft: var(--brand-red-soft);
+  --color-brand-blue: var(--brand-blue);
+  --color-brand-blue-soft: var(--brand-blue-soft);
   --color-success: var(--success);
   --color-success-soft: var(--success-soft);
   --color-warning: var(--warning);
@@ -52,7 +62,10 @@ html {
 }
 
 body {
-  @apply min-h-screen bg-canvas text-foreground;
+  @apply min-h-screen bg-canvas font-sans text-foreground antialiased;
+  background-image:
+    linear-gradient(180deg, rgba(129, 208, 245, 0.08) 0, rgba(129, 208, 245, 0) 180px),
+    linear-gradient(90deg, rgba(227, 0, 11, 0.04) 0, rgba(227, 0, 11, 0) 160px);
 }
 
 button,
@@ -67,6 +80,59 @@ textarea::placeholder {
 }
 
 ::selection {
-  background: rgba(35, 48, 63, 0.14);
+  background: rgba(227, 0, 11, 0.12);
 }
 
+.alrosa-rule {
+  position: relative;
+  height: 1px;
+  width: 4.5rem;
+  background: var(--brand-red);
+}
+
+.alrosa-rule::before,
+.alrosa-rule::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 0.45rem;
+  height: 0.45rem;
+  border: 1px solid var(--brand-red);
+  border-radius: 9999px;
+  background: var(--panel);
+  transform: translateY(-50%);
+}
+
+.alrosa-rule::before {
+  left: -0.18rem;
+}
+
+.alrosa-rule::after {
+  right: -0.18rem;
+}
+
+.alrosa-v-rule {
+  position: relative;
+}
+
+.alrosa-v-rule::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.75rem;
+  bottom: 0.75rem;
+  width: 1px;
+  background: var(--brand-red);
+}
+
+.alrosa-v-rule::after {
+  content: "";
+  position: absolute;
+  left: -0.18rem;
+  top: 0.45rem;
+  width: 0.45rem;
+  height: 0.45rem;
+  border: 1px solid var(--brand-red);
+  border-radius: 9999px;
+  background: var(--panel);
+}
