@@ -10,6 +10,8 @@ import { ProgressCard } from '@/components/ui/progress-card';
 import { SectionCard } from '@/components/ui/section-card';
 import { StatCard } from '@/components/ui/stat-card';
 import { StatusBadge } from '@/components/ui/status-badge';
+import { API_BASE_URL, getBackendHealth } from '@/lib/api';
+import { formatFullDate } from '@/lib/format';
 import {
   approvalQueue,
   calendarConflict,
@@ -18,7 +20,6 @@ import {
   learningProfile,
   upcomingLearning,
 } from '@/lib/mock-data';
-import { formatFullDate } from '@/lib/format';
 
 async function getDashboardData() {
   return {
@@ -37,6 +38,13 @@ export function DashboardContent() {
     queryFn: getDashboardData,
   });
 
+  const { data: backendHealth } = useQuery({
+    queryKey: ['backend-health'],
+    queryFn: getBackendHealth,
+    retry: false,
+    refetchInterval: 1000 * 30,
+  });
+
   if (isPending || !data) {
     return (
       <EmptyState
@@ -48,6 +56,28 @@ export function DashboardContent() {
 
   return (
     <div className="space-y-6">
+      <section className="rounded-2xl border border-border bg-panel px-5 py-4 shadow-[0_1px_2px_rgba(15,23,42,0.04)]">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+          <div>
+            <p className="text-sm font-medium text-foreground">Связь frontend и backend</p>
+            <p className="mt-1 text-sm text-muted">
+              Frontend работает на <span className="font-medium text-foreground">3080</span>,
+              backend ожидается на{' '}
+              <span className="font-medium text-foreground">3081</span>.
+            </p>
+            <p className="mt-1 text-xs text-muted">
+              Текущая API base URL:{' '}
+              <span className="font-medium text-foreground">{API_BASE_URL}</span>
+            </p>
+          </div>
+          <StatusBadge tone={backendHealth?.status === 'online' ? 'success' : 'danger'}>
+            {backendHealth?.status === 'online'
+              ? 'Backend доступен'
+              : 'Backend недоступен'}
+          </StatusBadge>
+        </div>
+      </section>
+
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         {data.stats.map((item) => (
           <StatCard
@@ -148,4 +178,3 @@ export function DashboardContent() {
     </div>
   );
 }
-
