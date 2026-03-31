@@ -11,6 +11,7 @@ import {
   Server,
 } from 'lucide-react';
 
+import { useAuth } from '@/components/providers/auth-provider';
 import { ApprovalList } from '@/components/ui/approval-list';
 import { CalendarConflictCard } from '@/components/ui/calendar-conflict-card';
 import { CertificateCard } from '@/components/ui/certificate-card';
@@ -19,7 +20,7 @@ import { ProgressCard } from '@/components/ui/progress-card';
 import { SectionCard } from '@/components/ui/section-card';
 import { StatCard } from '@/components/ui/stat-card';
 import { StatusBadge } from '@/components/ui/status-badge';
-import { API_BASE_URL, getBackendHealth } from '@/lib/api';
+import { getBackendHealth } from '@/lib/api';
 import { formatFullDate } from '@/lib/format';
 import {
   approvalQueue,
@@ -29,6 +30,7 @@ import {
   learningProfile,
   upcomingLearning,
 } from '@/lib/mock-data';
+import { getUserDisplayName } from '@/lib/user-display';
 
 async function getDashboardData() {
   return {
@@ -44,6 +46,7 @@ async function getDashboardData() {
 const statIcons = [BookOpen, BarChart3, GitPullRequest, CalendarDays];
 
 export function DashboardContent() {
+  const { user } = useAuth();
   const { data, isPending } = useQuery({
     queryKey: ['dashboard'],
     queryFn: getDashboardData,
@@ -66,6 +69,10 @@ export function DashboardContent() {
   }
 
   const backendOnline = backendHealth?.status === 'online';
+  const profileName = getUserDisplayName(user);
+  const approvalQueueItems = data.approvalQueue.map((item, index) =>
+    index === 0 ? { ...item, employee: profileName } : item,
+  );
 
   return (
     <div className="space-y-6">
@@ -85,9 +92,8 @@ export function DashboardContent() {
                   Обучение, согласование и календарь в одном окне
                 </h2>
                 <p className="mt-3 max-w-2xl text-sm leading-6 text-muted">
-                  Главная страница собрана как рабочий инструмент: важные статусы видны сразу,
-                  акценты дозированы, а структура остаётся понятной для сотрудника, руководителя
-                  и HR.
+                  Ключевые статусы обучения, согласования и календаря собраны на одном экране
+                  для сотрудников, руководителей и HR.
                 </p>
               </div>
             </div>
@@ -100,24 +106,23 @@ export function DashboardContent() {
                   <Server className="h-4 w-4" strokeWidth={1.9} />
                 </div>
                 <StatusBadge tone={backendOnline ? 'success' : 'danger'}>
-                  {backendOnline ? 'Backend доступен' : 'Backend недоступен'}
+                  {backendOnline ? 'Система активна' : 'Требует внимания'}
                 </StatusBadge>
               </div>
-              <p className="mt-4 text-sm font-semibold text-foreground">Связь с backend</p>
+              <p className="mt-4 text-sm font-semibold text-foreground">Состояние платформы</p>
               <p className="mt-2 text-sm leading-6 text-muted">
-                Текущий API base URL: <span className="font-medium text-foreground">{API_BASE_URL}</span>
+                Основные сервисы доступны, рабочие сценарии обучения и согласования выполняются в штатном режиме.
               </p>
             </div>
 
             <div className="rounded-[24px] border border-border bg-panel-subtle p-5">
               <div className="flex items-center justify-between gap-3">
                 <div className="alrosa-rule w-12" />
-                <StatusBadge tone="info">3080 → 3081</StatusBadge>
+                <StatusBadge tone="info">Единый контур</StatusBadge>
               </div>
-              <p className="mt-4 text-sm font-semibold text-foreground">Локальная связка</p>
+              <p className="mt-4 text-sm font-semibold text-foreground">Рабочая среда</p>
               <p className="mt-2 text-sm leading-6 text-muted">
-                Frontend работает на порте <span className="font-medium text-foreground">3080</span>,
-                backend ожидается на <span className="font-medium text-foreground">3081</span>.
+                Обучение, внешние заявки, календарь и профиль сотрудника объединены в одном рабочем пространстве.
               </p>
             </div>
           </div>
@@ -145,7 +150,7 @@ export function DashboardContent() {
         <div className="space-y-6">
           <SectionCard
             title="Ближайшее обучение"
-            description="Всё важное на ближайшие дни без перегруженного расписания."
+            description="Все важное на ближайшие дни без перегруженного расписания."
           >
             <div className="space-y-3">
               {data.upcomingLearning.map((item) => (
@@ -174,7 +179,7 @@ export function DashboardContent() {
             title="Согласование заявок"
             description="Текущие внешние курсы, которые требуют решения или внимания."
           >
-            <ApprovalList items={data.approvalQueue} />
+            <ApprovalList items={approvalQueueItems} />
           </SectionCard>
         </div>
 

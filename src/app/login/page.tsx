@@ -1,38 +1,38 @@
 import Link from 'next/link';
-import { ArrowRight, BadgeCheck, Shield } from 'lucide-react';
+import { ArrowRight, LogIn, Shield } from 'lucide-react';
 import { ReactNode } from 'react';
 
-import { RegisterForm } from '@/features/auth/register-form';
+import { LoginForm } from '@/features/auth/login-form';
 import { buttonVariants } from '@/components/ui/button';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { cn } from '@/lib/cn';
 
-export default function RegisterPage() {
+export default function LoginPage() {
   return (
     <main className="min-h-screen bg-canvas">
       <div className="mx-auto grid min-h-screen max-w-[1320px] gap-8 px-4 py-8 lg:grid-cols-[0.92fr_1.08fr] lg:px-8">
         <section className="flex flex-col justify-between rounded-[32px] border border-border bg-panel px-6 py-8 lg:px-8">
           <div>
             <div className="alrosa-rule mb-4" />
-            <StatusBadge tone="info">ALROSA IT registration</StatusBadge>
+            <StatusBadge tone="info">ALROSA IT access</StatusBadge>
             <h1 className="mt-5 text-4xl font-semibold tracking-tight text-foreground">
-              Регистрация в «Контуре развития»
+              Вход в «Контур развития»
             </h1>
             <p className="mt-4 max-w-xl text-sm leading-7 text-muted">
-              Регистрация создаёт базовую учётную запись сотрудника для доступа к обучению,
-              заявкам, календарю и сертификатам.
+              Единая точка доступа к корпоративному обучению, внешним заявкам, календарю,
+              сертификатам и аналитике.
             </p>
 
             <div className="mt-8 space-y-4">
               <FeatureCard
-                icon={<BadgeCheck className="h-4 w-4" strokeWidth={1.8} />}
-                title="Быстрый старт"
-                description="Регистрация открывает доступ к единому пространству обучения и развития."
+                icon={<LogIn className="h-4 w-4" strokeWidth={1.8} />}
+                title="Рабочее пространство"
+                description="В одном интерфейсе собраны обучение, внешние заявки, календарь и сертификаты."
               />
               <FeatureCard
                 icon={<Shield className="h-4 w-4" strokeWidth={1.8} />}
-                title="Понятный маршрут"
-                description="После создания аккаунта можно сразу перейти к заявкам, курсам и календарю."
+                title="Ежедневный инструмент"
+                description="Интерфейс подходит для сотрудников, руководителей и HR в повседневной работе."
               />
             </div>
           </div>
@@ -41,14 +41,14 @@ export default function RegisterPage() {
             <Link href="/" className={cn(buttonVariants({ variant: 'secondary' }), 'w-full sm:w-auto')}>
               На главную
             </Link>
-            <Link href="/login" className={cn(buttonVariants({ variant: 'ghost' }), 'w-full sm:w-auto')}>
-              Войти <ArrowRight className="ml-2 h-4 w-4" strokeWidth={1.8} />
+            <Link href="/register" className={cn(buttonVariants({ variant: 'ghost' }), 'w-full sm:w-auto')}>
+              Регистрация <ArrowRight className="ml-2 h-4 w-4" strokeWidth={1.8} />
             </Link>
           </div>
         </section>
 
         <section className="flex items-center">
-          <RegisterForm />
+          <LoginForm />
         </section>
       </div>
     </main>

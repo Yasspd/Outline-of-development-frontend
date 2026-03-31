@@ -5,8 +5,16 @@ export type NavigationItem = {
 };
 
 export const navigationItems: NavigationItem[] = [
-  { label: 'Главная', href: '/', description: 'Общая картина и ближайшие события' },
-  { label: 'Мои курсы', href: '/my-courses', description: 'Назначенные и активные обучения' },
+  {
+    label: 'Главная',
+    href: '/dashboard',
+    description: 'Общая картина, ближайшие события и текущие статусы',
+  },
+  {
+    label: 'Мои курсы',
+    href: '/my-courses',
+    description: 'Назначенные и активные обучения',
+  },
   {
     label: 'Внешнее обучение',
     href: '/external-learning',
@@ -17,15 +25,31 @@ export const navigationItems: NavigationItem[] = [
     href: '/corporate-university',
     description: 'Внутренние программы развития и soft skills',
   },
-  { label: 'Календарь', href: '/calendar', description: 'События и занятость' },
-  { label: 'Сертификаты', href: '/certificates', description: 'Подтверждения обучения' },
-  { label: 'Аналитика', href: '/analytics', description: 'Показатели и отчёты' },
-  { label: 'Настройки', href: '/settings', description: 'Профиль и уведомления' },
+  {
+    label: 'Календарь',
+    href: '/calendar',
+    description: 'События и занятость',
+  },
+  {
+    label: 'Сертификаты',
+    href: '/certificates',
+    description: 'Подтверждения обучения',
+  },
+  {
+    label: 'Аналитика',
+    href: '/analytics',
+    description: 'Показатели и отчёты',
+  },
+  {
+    label: 'Настройки',
+    href: '/settings',
+    description: 'Профиль и уведомления',
+  },
 ];
 
 export const pageMeta: Record<string, { title: string; description: string }> = {
-  '/': {
-    title: 'Добро пожаловать, Анна',
+  '/dashboard': {
+    title: 'Рабочее пространство',
     description: 'Держите под контролем активные обучения, согласования и ближайшие занятия.',
   },
   '/my-courses': {

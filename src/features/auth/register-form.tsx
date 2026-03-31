@@ -14,6 +14,7 @@ import { PrimaryButton } from '@/components/ui/primary-button';
 import { SecondaryButton } from '@/components/ui/secondary-button';
 import { SectionCard } from '@/components/ui/section-card';
 import { StatusBadge } from '@/components/ui/status-badge';
+import { useAuth } from '@/components/providers/auth-provider';
 import { cn } from '@/lib/cn';
 import { registerUser } from '@/lib/api';
 import {
@@ -33,10 +34,8 @@ const defaultValues: RegisterFormValues = {
   outlookEmail: '',
 };
 
-const accessTokenStorageKey = 'kontur.accessToken';
-const refreshTokenStorageKey = 'kontur.refreshToken';
-
 export function RegisterForm() {
+  const { setSession } = useAuth();
   const form = useForm<RegisterFormValues>({
     resolver: zodResolver(registerFormSchema),
     defaultValues,
@@ -45,8 +44,10 @@ export function RegisterForm() {
   const registerMutation = useMutation({
     mutationFn: registerUser,
     onSuccess: (response) => {
-      window.localStorage.setItem(accessTokenStorageKey, response.accessToken);
-      window.localStorage.setItem(refreshTokenStorageKey, response.refreshToken);
+      setSession({
+        accessToken: response.accessToken,
+        refreshToken: response.refreshToken,
+      });
     },
   });
 
@@ -80,7 +81,7 @@ export function RegisterForm() {
         </div>
 
         <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-          <Link href="/" className={cn(buttonVariants({ variant: 'primary' }), 'w-full sm:w-auto')}>
+          <Link href="/dashboard" className={cn(buttonVariants({ variant: 'primary' }), 'w-full sm:w-auto')}>
             Перейти в рабочее пространство
           </Link>
           <SecondaryButton

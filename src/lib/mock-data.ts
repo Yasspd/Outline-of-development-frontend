@@ -1,4 +1,5 @@
 import { StatusTone } from '@/components/ui/status-badge';
+import { demoEmployeeProfile } from '@/lib/demo-profile';
 
 export type DashboardStat = {
   label: string;
@@ -139,7 +140,7 @@ export const approvalQueue: ApprovalItem[] = [
   {
     id: 'approval-1',
     title: 'Product Discovery Bootcamp',
-    employee: 'Анна Климова',
+    employee: demoEmployeeProfile.fullName,
     stage: 'Manager approval',
     cost: 48000,
     status: 'Требует решения',
@@ -343,14 +344,13 @@ export const analyticsSnapshot = {
 };
 
 export const settingsSnapshot = {
-  fullName: 'Анна Климова',
-  role: 'Employee / Team Lead',
-  email: 'anna.klimova@company.ru',
-  department: 'Platform Engineering',
+  fullName: demoEmployeeProfile.fullName,
+  role: demoEmployeeProfile.roleLabel,
+  email: demoEmployeeProfile.email,
+  department: demoEmployeeProfile.department,
   notifications: [
     'Напоминания о старте обучения',
     'Изменения статуса заявки',
     'Конфликты календаря',
   ],
 };
-
