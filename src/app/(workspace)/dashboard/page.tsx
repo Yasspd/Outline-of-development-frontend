@@ -1,5 +1,5 @@
-import { DashboardContent } from '@/features/dashboard/dashboard-content';
+import { WorkspaceRedirect } from '@/components/workspace/workspace-redirect';
 
 export default function DashboardPage() {
-  return <DashboardContent />;
+  return <WorkspaceRedirect sourcePath="/dashboard" />;
 }

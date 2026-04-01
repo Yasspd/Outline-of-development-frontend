@@ -16,7 +16,7 @@ const featureItems = [
   {
     title: 'Согласование и календарь',
     description:
-      'Заявки проходят понятный approval-flow, а календарные конфликты видны до отправки курса.',
+      'Заявки проходят понятный маршрут согласования, а календарные пересечения видны до отправки курса.',
     icon: CalendarDays,
   },
   {
@@ -36,7 +36,7 @@ export default function HomePage() {
             <div className="max-w-3xl">
               <div className="mb-4 flex items-center gap-3">
                 <div className="alrosa-rule shrink-0" />
-                <StatusBadge tone="info">ALROSA IT learning platform</StatusBadge>
+                <StatusBadge tone="info">Единый контур обучения ALROSA IT</StatusBadge>
               </div>
               <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-muted">
                 Контур развития
@@ -96,11 +96,11 @@ export default function HomePage() {
         <section className="mt-6 grid gap-6 lg:grid-cols-[1.15fr_0.85fr]">
           <SectionCard
             title="Основные разделы платформы"
-            description="Рабочая структура включает dashboard, обучение, календарь, сертификаты и аналитику."
+            description="Рабочая структура включает главную, обучение, календарь, сертификаты и аналитику."
           >
             <div className="grid gap-3 sm:grid-cols-2">
               <div className="rounded-[24px] border border-border bg-panel-subtle p-5">
-                <p className="text-sm font-semibold text-foreground">Dashboard</p>
+                <p className="text-sm font-semibold text-foreground">Главная</p>
                 <p className="mt-2 text-sm leading-6 text-muted">
                   Активные обучения, ближайшие события, заявки на согласовании и календарные конфликты.
                 </p>
@@ -108,13 +108,13 @@ export default function HomePage() {
               <div className="rounded-[24px] border border-border bg-panel-subtle p-5">
                 <p className="text-sm font-semibold text-foreground">Внешнее обучение</p>
                 <p className="mt-2 text-sm leading-6 text-muted">
-                  Подача заявки, бюджет, manager approval, HR approval и итоговый статус.
+                  Подача заявки, бюджет, согласование руководителя, согласование кадровой службы и итоговый статус.
                 </p>
               </div>
               <div className="rounded-[24px] border border-border bg-panel-subtle p-5">
                 <p className="text-sm font-semibold text-foreground">Корпоративный университет</p>
                 <p className="mt-2 text-sm leading-6 text-muted">
-                  Внутренние программы развития, soft skills и назначенные курсы.
+                  Внутренние программы развития, гибкие навыки и назначенные курсы.
                 </p>
               </div>
               <div className="rounded-[24px] border border-border bg-panel-subtle p-5">
@@ -146,7 +146,7 @@ export default function HomePage() {
               <div className="rounded-[24px] border border-border bg-panel-subtle p-5">
                 <p className="text-sm font-semibold text-foreground">Маршрут согласования</p>
                 <p className="mt-3 text-sm leading-6 text-muted">
-                  Заявка на внешний курс проходит этапы manager approval и HR approval в прозрачном процессе.
+                  Заявка на внешний курс проходит этапы согласования руководителя и кадровой службы в прозрачном процессе.
                 </p>
               </div>
 

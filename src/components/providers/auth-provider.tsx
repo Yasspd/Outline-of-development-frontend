@@ -11,6 +11,7 @@ import {
   getStoredRefreshToken,
   persistAuthTokens,
 } from '@/lib/api';
+import { resolvePrimaryRole, WorkspaceRole } from '@/lib/roles';
 
 type SessionTokens = {
   accessToken: string | null;
@@ -19,6 +20,7 @@ type SessionTokens = {
 
 type AuthContextValue = {
   user: CurrentUserProfile | null;
+  primaryRole: WorkspaceRole | null;
   accessToken: string | null;
   refreshToken: string | null;
   isAuthenticated: boolean;
@@ -72,6 +74,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     <AuthContext.Provider
       value={{
         user: currentUserQuery.data ?? null,
+        primaryRole: currentUserQuery.data ? resolvePrimaryRole(currentUserQuery.data.roles) : null,
         accessToken: session.accessToken,
         refreshToken: session.refreshToken,
         isAuthenticated: Boolean(session.accessToken && currentUserQuery.data),

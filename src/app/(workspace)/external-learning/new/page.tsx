@@ -1,5 +1,5 @@
-import { ExternalLearningForm } from '@/features/external-learning/external-learning-form';
+import { WorkspaceRedirect } from '@/components/workspace/workspace-redirect';
 
-export default function NewExternalLearningRequestPage() {
-  return <ExternalLearningForm />;
+export default function ExternalLearningNewPage() {
+  return <WorkspaceRedirect sourcePath="/external-learning/new" />;
 }

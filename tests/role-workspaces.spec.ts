@@ -1,0 +1,59 @@
+import { expect, test } from '@playwright/test';
+
+const password = 'Password123!';
+
+async function login(page: import('@playwright/test').Page, email: string) {
+  await page.goto('/login');
+  await page.getByLabel('Эл. почта').fill(email);
+  await page.getByLabel('Пароль').fill(password);
+  const submitButton = page.getByRole('button', { name: 'Войти' });
+  await expect(submitButton).toBeEnabled();
+  await submitButton.click();
+}
+
+test('employee lands in employee workspace and sees seeded HR course', async ({ page }) => {
+  await login(page, 'employee@kontur.local');
+
+  await expect(page).toHaveURL(/\/employee\/dashboard$/);
+
+  await page.goto('/employee/my-courses');
+  await expect(page.getByText('ALROSA IT Foundations: Learning Workflow Platform')).toBeVisible();
+});
+
+test('manager lands in manager workspace and sees team members', async ({ page }) => {
+  await login(page, 'manager@kontur.local');
+
+  await expect(page).toHaveURL(/\/manager\/dashboard$/);
+
+  await page.goto('/manager/team');
+  await expect(page.getByText('employee.demo@kontur.local')).toBeVisible();
+});
+
+test('hr lands in hr workspace and sees users and courses', async ({ page }) => {
+  await login(page, 'hr.admin@kontur.local');
+
+  await expect(page).toHaveURL(/\/hr\/dashboard$/);
+
+  await page.goto('/hr/users');
+  await expect(page.getByText('employee@kontur.local')).toBeVisible();
+
+  await page.goto('/hr/courses');
+  await expect(page.getByText('ALROSA IT Foundations: Learning Workflow Platform')).toBeVisible();
+});
+
+test('trainer lands in trainer workspace and sees seeded participant monitoring', async ({ page }) => {
+  await login(page, 'trainer@kontur.local');
+
+  await expect(page).toHaveURL(/\/trainer\/dashboard$/);
+
+  await page.goto('/trainer/participants');
+  await expect(page.getByText('employee.demo@kontur.local')).toBeVisible();
+});
+
+test('employee is redirected away from hr workspace', async ({ page }) => {
+  await login(page, 'employee@kontur.local');
+  await expect(page).toHaveURL(/\/employee\/dashboard$/);
+
+  await page.goto('/hr/dashboard');
+  await expect(page).toHaveURL(/\/employee\/dashboard$/);
+});

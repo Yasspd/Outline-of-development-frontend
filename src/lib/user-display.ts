@@ -1,10 +1,11 @@
 import type { CurrentUserProfile } from '@/lib/api';
+import { resolvePrimaryRole } from '@/lib/roles';
 
 const roleLabels: Record<string, string> = {
-  EMPLOYEE: 'Employee',
-  MANAGER: 'Manager',
-  HR_LD_ADMIN: 'HR / L&D Admin',
-  INTERNAL_TRAINER: 'Internal Trainer',
+  EMPLOYEE: 'Сотрудник',
+  MANAGER: 'Руководитель',
+  HR_LD_ADMIN: 'Кадры и развитие',
+  INTERNAL_TRAINER: 'Внутренний тренер',
 };
 
 export function getUserDisplayName(
@@ -19,10 +20,28 @@ export function getUserDisplayName(
 
 export function getUserRoleLabel(roles: string[] | null | undefined): string {
   if (!roles?.length) {
-    return 'Employee';
+    return 'Сотрудник';
   }
 
   return roles.map((role) => roleLabels[role] ?? role).join(' / ');
+}
+
+export function getPrimaryRoleLabel(roles: string[] | null | undefined): string {
+  const primaryRole = resolvePrimaryRole(roles);
+
+  if (primaryRole === 'hr') {
+    return roleLabels.HR_LD_ADMIN;
+  }
+
+  if (primaryRole === 'trainer') {
+    return roleLabels.INTERNAL_TRAINER;
+  }
+
+  if (primaryRole === 'manager') {
+    return roleLabels.MANAGER;
+  }
+
+  return roleLabels.EMPLOYEE;
 }
 
 export function getUserMetaLine(user: CurrentUserProfile | null | undefined): string {

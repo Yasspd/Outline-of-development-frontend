@@ -5,8 +5,9 @@
   "scripts": {
     "dev": "next dev -p 3180",
     "build": "next build",
-    "start": "next start -p 3180d",
-    "lint": "next lint"
+    "start": "next start -p 3180",
+    "lint": "next lint",
+    "test:smoke": "playwright test"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
@@ -22,6 +23,7 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
+    "@playwright/test": "^1.55.1",
     "@tailwindcss/postcss": "^4.2.2",
     "@types/node": "^25.5.0",
     "@types/react": "^19.2.14",

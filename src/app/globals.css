@@ -136,3 +136,28 @@ textarea::placeholder {
   border-radius: 9999px;
   background: var(--panel);
 }
+
+.app-sidebar-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(91, 100, 112, 0.45) transparent;
+}
+
+.app-sidebar-scrollbar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.app-sidebar-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.app-sidebar-scrollbar::-webkit-scrollbar-thumb {
+  border: 2px solid transparent;
+  border-radius: 9999px;
+  background: rgba(91, 100, 112, 0.35);
+  background-clip: padding-box;
+}
+
+.app-sidebar-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(91, 100, 112, 0.5);
+  background-clip: padding-box;
+}

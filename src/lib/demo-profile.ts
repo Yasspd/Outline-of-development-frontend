@@ -3,7 +3,7 @@ export const demoEmployeeProfile = {
   lastName: 'Климова',
   fullName: 'Анна Климова',
   email: 'anna.klimova@company.ru',
-  department: 'Platform Engineering',
-  position: 'Team Lead',
-  roleLabel: 'Employee / Team Lead',
+  department: 'Разработка платформы',
+  position: 'Руководитель команды',
+  roleLabel: 'Сотрудник / Руководитель команды',
 } as const;

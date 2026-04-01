@@ -17,6 +17,7 @@ import { StatusBadge } from '@/components/ui/status-badge';
 import { useAuth } from '@/components/providers/auth-provider';
 import { cn } from '@/lib/cn';
 import { registerUser } from '@/lib/api';
+import { getUserRoleLabel } from '@/lib/user-display';
 import {
   RegisterFormValues,
   registerFormSchema,
@@ -35,7 +36,7 @@ const defaultValues: RegisterFormValues = {
 };
 
 export function RegisterForm() {
-  const { setSession } = useAuth();
+  const { setSession, hasHydrated } = useAuth();
   const form = useForm<RegisterFormValues>({
     resolver: zodResolver(registerFormSchema),
     defaultValues,
@@ -59,7 +60,7 @@ export function RegisterForm() {
     return (
       <SectionCard
         title="Регистрация завершена"
-        description="Учётная запись создана, токены сохранены локально, пользователю назначена роль Employee."
+        description="Учётная запись создана, доступ сохранён локально, пользователю назначена роль сотрудника."
       >
         <div className="rounded-[24px] border border-border bg-panel-subtle p-5">
           <div className="flex items-center justify-between gap-3">
@@ -72,7 +73,7 @@ export function RegisterForm() {
                   {registerMutation.data.user.email}
                 </p>
                 <p className="mt-1 text-sm text-muted">
-                  Роли: {registerMutation.data.user.roles.join(', ')}
+                  Роли: {getUserRoleLabel(registerMutation.data.user.roles)}
                 </p>
               </div>
             </div>
@@ -81,11 +82,12 @@ export function RegisterForm() {
         </div>
 
         <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-          <Link href="/dashboard" className={cn(buttonVariants({ variant: 'primary' }), 'w-full sm:w-auto')}>
+          <Link href="/workspace" className={cn(buttonVariants({ variant: 'primary' }), 'w-full sm:w-auto')}>
             Перейти в рабочее пространство
           </Link>
           <SecondaryButton
             type="button"
+            disabled={!hasHydrated}
             onClick={() => {
               registerMutation.reset();
               form.reset(defaultValues);
@@ -101,7 +103,7 @@ export function RegisterForm() {
   return (
     <SectionCard
       title="Создание учётной записи"
-      description="Публичная регистрация создаёт сотрудника с базовой ролью Employee. Менеджера и дополнительные роли потом может назначить HR."
+      description="Публичная регистрация создаёт сотрудника с базовой ролью. Руководителя и дополнительные роли позже может назначить кадровая служба."
     >
       <form className="space-y-5" onSubmit={form.handleSubmit(onSubmit)}>
         <div className="grid gap-5 md:grid-cols-2">
@@ -118,7 +120,7 @@ export function RegisterForm() {
           </div>
 
           <div className="md:col-span-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email">Эл. почта</Label>
             <Input
               id="email"
               type="email"
@@ -154,7 +156,7 @@ export function RegisterForm() {
             <Label htmlFor="position">Должность</Label>
             <Input
               id="position"
-              placeholder="Backend Engineer"
+              placeholder="Инженер-разработчик"
               {...form.register('position')}
             />
             <FieldError message={form.formState.errors.position?.message} />
@@ -164,14 +166,14 @@ export function RegisterForm() {
             <Label htmlFor="department">Подразделение</Label>
             <Input
               id="department"
-              placeholder="Platform Engineering"
+              placeholder="Разработка платформы"
               {...form.register('department')}
             />
             <FieldError message={form.formState.errors.department?.message} />
           </div>
 
           <div className="md:col-span-2">
-            <Label htmlFor="outlookEmail">Outlook email</Label>
+            <Label htmlFor="outlookEmail">Почта Outlook</Label>
             <Input
               id="outlookEmail"
               type="email"
@@ -189,10 +191,14 @@ export function RegisterForm() {
         ) : null}
 
         <div className="flex flex-col gap-3 sm:flex-row">
-          <PrimaryButton type="submit" disabled={registerMutation.isPending}>
+          <PrimaryButton type="submit" disabled={!hasHydrated || registerMutation.isPending}>
             {registerMutation.isPending ? 'Создаём аккаунт...' : 'Зарегистрироваться'}
           </PrimaryButton>
-          <SecondaryButton type="button" onClick={() => form.reset(defaultValues)}>
+          <SecondaryButton
+            type="button"
+            disabled={!hasHydrated || registerMutation.isPending}
+            onClick={() => form.reset(defaultValues)}
+          >
             Очистить форму
           </SecondaryButton>
         </div>
@@ -202,17 +208,17 @@ export function RegisterForm() {
         <InfoTile
           icon={<UserRoundPlus className="h-4 w-4" strokeWidth={1.8} />}
           title="Роль по умолчанию"
-          description="Employee"
+          description="Сотрудник"
         />
         <InfoTile
           icon={<Building2 className="h-4 w-4" strokeWidth={1.8} />}
           title="Менеджер"
-          description="Назначается позже через HR"
+          description="Назначается позже через кадровую службу"
         />
         <InfoTile
           icon={<KeyRound className="h-4 w-4" strokeWidth={1.8} />}
           title="После регистрации"
-          description="JWT токены сохраняются локально"
+          description="Доступ сохраняется локально"
         />
       </div>
     </SectionCard>

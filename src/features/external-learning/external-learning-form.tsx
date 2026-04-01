@@ -187,7 +187,7 @@ export function ExternalLearningForm() {
             </p>
             <p className="mt-2 text-sm leading-6 text-muted">
               При стоимости выше 50 000 ₽ заявка требует дополнительной проверки со стороны
-              HR / L&D.
+              кадровой службы.
             </p>
           </div>
         </SectionCard>
@@ -234,7 +234,7 @@ export function ExternalLearningForm() {
                 <div className="flex items-center justify-between gap-3">
                   <div className="flex items-center gap-3">
                     <GitPullRequest className="h-4 w-4 text-brand-red" strokeWidth={1.8} />
-                    <p className="font-medium text-foreground">1. Manager approval</p>
+                    <p className="font-medium text-foreground">1. Согласование руководителя</p>
                   </div>
                   <StatusBadge tone="neutral">Первый этап</StatusBadge>
                 </div>
@@ -249,12 +249,12 @@ export function ExternalLearningForm() {
                 <div className="flex items-center justify-between gap-3">
                   <div className="flex items-center gap-3">
                     <ShieldCheck className="h-4 w-4 text-info" strokeWidth={1.8} />
-                    <p className="font-medium text-foreground">2. HR / L&D approval</p>
+                    <p className="font-medium text-foreground">2. Согласование кадровой службы</p>
                   </div>
                   <StatusBadge tone="info">Финальное решение</StatusBadge>
                 </div>
                 <p className="mt-2 text-sm leading-6 text-muted">
-                  HR проверяет бюджет, формат обучения и итоговый маршрут сотрудника.
+                  Кадровая служба проверяет бюджет, формат обучения и итоговый маршрут сотрудника.
                 </p>
               </div>
             </div>

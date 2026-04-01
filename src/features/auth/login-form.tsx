@@ -27,7 +27,7 @@ const defaultValues: LoginFormValues = {
 
 export function LoginForm() {
   const router = useRouter();
-  const { setSession } = useAuth();
+  const { setSession, hasHydrated } = useAuth();
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginFormSchema),
     defaultValues,
@@ -40,7 +40,7 @@ export function LoginForm() {
         accessToken: response.accessToken,
         refreshToken: response.refreshToken,
       });
-      router.push('/dashboard');
+      router.push('/workspace');
     },
   });
 
@@ -56,7 +56,7 @@ export function LoginForm() {
       <form className="space-y-5" onSubmit={form.handleSubmit(onSubmit)}>
         <div className="grid gap-5">
           <div>
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email">Эл. почта</Label>
             <Input id="email" type="email" placeholder="anna.klimova@company.ru" {...form.register('email')} />
             <FieldError message={form.formState.errors.email?.message} />
           </div>
@@ -75,10 +75,14 @@ export function LoginForm() {
         ) : null}
 
         <div className="flex flex-col gap-3 sm:flex-row">
-          <PrimaryButton type="submit" disabled={loginMutation.isPending}>
+          <PrimaryButton type="submit" disabled={!hasHydrated || loginMutation.isPending}>
             {loginMutation.isPending ? 'Выполняем вход...' : 'Войти'}
           </PrimaryButton>
-          <SecondaryButton type="button" onClick={() => form.reset(defaultValues)}>
+          <SecondaryButton
+            type="button"
+            disabled={!hasHydrated || loginMutation.isPending}
+            onClick={() => form.reset(defaultValues)}
+          >
             Очистить
           </SecondaryButton>
         </div>
@@ -87,8 +91,8 @@ export function LoginForm() {
       <div className="mt-6 grid gap-3 sm:grid-cols-2">
         <InfoTile
           icon={<ShieldCheck className="h-4 w-4" strokeWidth={1.8} />}
-          title="JWT-сессия"
-          description="После успешного входа токены сохраняются локально и профиль загружается автоматически."
+          title="Рабочая сессия"
+          description="После успешного входа доступ сохраняется локально, а профиль загружается автоматически."
         />
         <InfoTile
           icon={<KeyRound className="h-4 w-4" strokeWidth={1.8} />}

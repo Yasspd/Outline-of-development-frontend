@@ -14,7 +14,7 @@ export default function RegisterPage() {
         <section className="flex flex-col justify-between rounded-[32px] border border-border bg-panel px-6 py-8 lg:px-8">
           <div>
             <div className="alrosa-rule mb-4" />
-            <StatusBadge tone="info">ALROSA IT registration</StatusBadge>
+            <StatusBadge tone="info">Регистрация в ALROSA IT</StatusBadge>
             <h1 className="mt-5 text-4xl font-semibold tracking-tight text-foreground">
               Регистрация в «Контуре развития»
             </h1>

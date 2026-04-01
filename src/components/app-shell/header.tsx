@@ -4,16 +4,16 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 import { useAuth } from '@/components/providers/auth-provider';
-import { SearchInput } from '@/components/ui/search-input';
 import { buttonVariants } from '@/components/ui/button';
+import { SearchInput } from '@/components/ui/search-input';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { cn } from '@/lib/cn';
-import { pageMeta } from '@/lib/navigation';
+import { resolvePageMeta } from '@/lib/navigation';
 import { getUserDisplayName, getUserMetaLine } from '@/lib/user-display';
 
 export function Header() {
   const pathname = usePathname();
-  const meta = pageMeta[pathname] ?? pageMeta['/dashboard'];
+  const meta = resolvePageMeta(pathname);
   const { user } = useAuth();
   const displayName = getUserDisplayName(user);
   const metaLine = getUserMetaLine(user);
@@ -24,7 +24,7 @@ export function Header() {
         <div className="max-w-3xl">
           <div className="mb-4 flex items-center gap-3">
             <div className="alrosa-rule shrink-0" />
-            <StatusBadge tone="info">ALROSA IT learning workspace</StatusBadge>
+            <StatusBadge tone="info">Единый контур обучения ALROSA IT</StatusBadge>
           </div>
           <p className="text-sm font-medium text-foreground">Здравствуйте, {displayName}</p>
           <h1 className="text-3xl font-semibold tracking-tight text-foreground sm:text-[2rem]">
@@ -45,12 +45,14 @@ export function Header() {
               <p className="mt-1 text-xs text-muted">{user.email}</p>
             </div>
           ) : null}
-          <Link
-            href="/external-learning/new"
-            className={cn(buttonVariants({ variant: 'primary' }), 'w-full sm:w-auto')}
-          >
-            Подать заявку на внешний курс
-          </Link>
+          {meta.actionHref && meta.actionLabel ? (
+            <Link
+              href={meta.actionHref}
+              className={cn(buttonVariants({ variant: 'primary' }), 'w-full sm:w-auto')}
+            >
+              {meta.actionLabel}
+            </Link>
+          ) : null}
         </div>
       </div>
     </header>
