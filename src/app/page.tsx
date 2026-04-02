@@ -36,7 +36,7 @@ export default function HomePage() {
             <div className="max-w-3xl">
               <div className="mb-4 flex items-center gap-3">
                 <div className="alrosa-rule shrink-0" />
-                <StatusBadge tone="info">Единый контур обучения ALROSA IT</StatusBadge>
+                <StatusBadge tone="info">Единый контур обучения АЛРОСА ИТ</StatusBadge>
               </div>
               <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-muted">
                 Контур развития

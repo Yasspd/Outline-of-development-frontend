@@ -17,7 +17,7 @@ export default defineConfig({
       timeout: 180000,
     },
     {
-      command: 'npm run dev',
+      command: 'npm run build && npm run start',
       cwd: '.',
       url: 'http://localhost:3180/login',
       reuseExistingServer: true,

@@ -14,7 +14,7 @@ export default function LoginPage() {
         <section className="flex flex-col justify-between rounded-[32px] border border-border bg-panel px-6 py-8 lg:px-8">
           <div>
             <div className="alrosa-rule mb-4" />
-            <StatusBadge tone="info">Доступ в ALROSA IT</StatusBadge>
+            <StatusBadge tone="info">Доступ в АЛРОСА ИТ</StatusBadge>
             <h1 className="mt-5 text-4xl font-semibold tracking-tight text-foreground">
               Вход в «Контур развития»
             </h1>

@@ -60,32 +60,37 @@ const navigationByRole: Record<WorkspaceRole, NavigationItem[]> = {
     {
       label: 'Главная',
       href: '/hr/dashboard',
-      description: 'Обзор пользователей, курсов, аналитики и согласований.',
+      description: 'Главные показатели, приоритетные задачи и состояние контура обучения.',
     },
     {
       label: 'Пользователи',
       href: '/hr/users',
-      description: 'Создание пользователей и контроль ролей.',
+      description: 'Сотрудники, роли и оргструктура обучения.',
     },
     {
       label: 'Согласования',
       href: '/hr/approvals',
-      description: 'Финальные решения по внешнему обучению.',
+      description: 'Очередь решений и реестр заявок на внешнее обучение.',
     },
     {
       label: 'Курсы',
       href: '/hr/courses',
-      description: 'Создание и публикация корпоративных курсов.',
+      description: 'Каталог внутренних курсов, публикация и назначения.',
+    },
+    {
+      label: 'Сертификаты',
+      href: '/hr/certificates',
+      description: 'Проверка подтверждающих документов по завершённому обучению.',
     },
     {
       label: 'Аналитика',
       href: '/hr/analytics',
-      description: 'Ключевые показатели по обучению и бюджету.',
+      description: 'Показатели по обучению, бюджету и очередям согласования.',
     },
     {
       label: 'Отчёты',
       href: '/hr/reports',
-      description: 'Сводки и экспорт MVP-отчётов.',
+      description: 'Сводки для руководства и выгрузка данных.',
     },
     {
       label: 'Настройки',
@@ -210,44 +215,51 @@ const pageMetaByPrefix: Array<{
     prefix: '/hr/dashboard',
     meta: {
       title: 'Кабинет кадровой службы',
-      description: 'Пользователи, курсы, согласования, аналитика и отчёты.',
-      actionHref: '/hr/users',
-      actionLabel: 'Создать пользователя',
+      description: 'Решения по обучению, пользователи, сертификаты и управленческая картина по всему контуру.',
+      actionHref: '/hr/approvals',
+      actionLabel: 'Открыть очередь',
     },
   },
   {
     prefix: '/hr/users',
     meta: {
       title: 'Пользователи и роли',
-      description: 'Создание аккаунтов и контроль распределения ролей.',
+      description: 'Создание сотрудников, распределение ролей и поддержка структуры команды.',
     },
   },
   {
     prefix: '/hr/approvals',
     meta: {
       title: 'Согласования кадровой службы',
-      description: 'Финальные решения по внешнему обучению сотрудников.',
+      description: 'Финальные решения по заявкам и общий реестр внешнего обучения сотрудников.',
     },
   },
   {
     prefix: '/hr/courses',
     meta: {
       title: 'Курсы и программы',
-      description: 'Создание и публикация внутренних курсов кадровой службы.',
+      description: 'Внутренние курсы, публикация и назначения сотрудникам.',
+    },
+  },
+  {
+    prefix: '/hr/certificates',
+    meta: {
+      title: 'Сертификаты',
+      description: 'Очередь подтверждения документов и история решений по завершённому обучению.',
     },
   },
   {
     prefix: '/hr/analytics',
     meta: {
       title: 'Аналитика',
-      description: 'Показатели по курсам, внешнему обучению и бюджету.',
+      description: 'Показатели по людям, обучению, бюджету и контролю выполнения.',
     },
   },
   {
     prefix: '/hr/reports',
     meta: {
       title: 'Отчёты',
-      description: 'Сводки и экспорт учебных отчётов для MVP.',
+      description: 'Сводные материалы по обучению и внешним заявкам для руководства.',
     },
   },
   {
@@ -291,7 +303,7 @@ const pageMetaByPrefix: Array<{
 
 const defaultMeta: PageMeta = {
   title: 'Контур развития',
-  description: 'Единая цифровая среда обучения сотрудников ALROSA IT.',
+  description: 'Единая цифровая среда обучения сотрудников АЛРОСА ИТ.',
 };
 
 export function getNavigationItems(role: WorkspaceRole | null | undefined): NavigationItem[] {

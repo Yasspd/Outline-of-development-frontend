@@ -77,12 +77,25 @@ export default function HrUsersPage() {
 
   const users = usersQuery.data;
   const managers = users.filter((user) => user.roles.includes('MANAGER'));
+  const summary = {
+    total: users.length,
+    employees: users.filter((user) => user.roles.includes('EMPLOYEE')).length,
+    managers: users.filter((user) => user.roles.includes('MANAGER')).length,
+    trainers: users.filter((user) => user.roles.includes('INTERNAL_TRAINER')).length,
+  };
 
   return (
     <div className="space-y-6">
+      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <SummaryCard label="Все аккаунты" value={String(summary.total)} />
+        <SummaryCard label="Сотрудники" value={String(summary.employees)} />
+        <SummaryCard label="Руководители" value={String(summary.managers)} />
+        <SummaryCard label="Тренеры" value={String(summary.trainers)} />
+      </section>
+
       <SectionCard
         title="Создать пользователя"
-        description="Новый аккаунт создаётся без учебной активности и начинает с пустого рабочего пространства."
+        description="Новый сотрудник появляется в системе без учебной истории и может сразу начать работать в своём кабинете."
       >
         <form className="grid gap-5 md:grid-cols-2" onSubmit={handleSubmit}>
           <FormField label="Имя">
@@ -148,7 +161,7 @@ export default function HrUsersPage() {
 
       <SectionCard
         title="Все пользователи"
-        description="Список аккаунтов и их роли в корпоративном контуре обучения."
+        description="Сотрудники, назначенные роли и место каждого пользователя в учебном процессе."
       >
         <div className="space-y-3">
           {users.map((user) => (
@@ -161,6 +174,12 @@ export default function HrUsersPage() {
                   <p className="mt-1 text-sm text-muted">{user.email}</p>
                   <p className="mt-1 text-sm text-muted">
                     {user.position ?? 'Должность не указана'} · {user.department ?? 'Подразделение не указано'}
+                  </p>
+                  <p className="mt-1 text-sm text-muted">
+                    Руководитель:{' '}
+                    {user.manager
+                      ? `${user.manager.firstName} ${user.manager.lastName}`
+                      : 'не назначен'}
                   </p>
                 </div>
                 <div className="flex flex-wrap gap-2">
@@ -175,6 +194,22 @@ export default function HrUsersPage() {
           ))}
         </div>
       </SectionCard>
+    </div>
+  );
+}
+
+function SummaryCard({
+  label,
+  value,
+}: {
+  label: string;
+  value: string;
+}) {
+  return (
+    <div className="rounded-[24px] border border-border bg-panel p-5">
+      <div className="alrosa-rule mb-4" />
+      <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted">{label}</p>
+      <p className="mt-3 text-3xl font-semibold text-foreground">{value}</p>
     </div>
   );
 }

@@ -20,6 +20,7 @@ export type ExternalLearningStatus =
 export type ApprovalStage = 'MANAGER' | 'HR';
 export type ApprovalStatus = 'PENDING' | 'APPROVED' | 'REJECTED' | 'SKIPPED';
 export type CertificateStatus = 'UPLOADED' | 'ACCEPTED' | 'REJECTED';
+export type NotificationStatus = 'PENDING' | 'SENT' | 'FAILED';
 
 export type AuthenticatedUser = {
   id: string;
@@ -189,6 +190,18 @@ export type BackendHealthStatus = {
   url: string;
 };
 
+export type NotificationRecord = {
+  id: string;
+  userId: string;
+  title: string;
+  body: string;
+  status: NotificationStatus;
+  payload?: Record<string, unknown> | null;
+  sentAt: string | null;
+  readAt: string | null;
+  createdAt: string;
+};
+
 export type AnalyticsOverview = {
   users: number;
   courses: number;
@@ -198,9 +211,14 @@ export type AnalyticsOverview = {
 
 export type CoursesAnalytics = {
   totalCourses: number;
+  draftCourses?: number;
   publishedCourses: number;
+  archivedCourses?: number;
   totalEnrollments: number;
+  activeEnrollments?: number;
   completedEnrollments: number;
+  completionRate?: number;
+  averageProgress?: number;
 };
 
 export type ExternalLearningAnalytics = {
@@ -210,7 +228,160 @@ export type ExternalLearningAnalytics = {
       _all: number;
     };
   }>;
+  requestedBudget?: number;
   approvedBudget: number;
+  inReviewBudget?: number;
+  rejectedBudget?: number;
+  completionRate?: number;
+  calendarConflicts?: number;
+};
+
+export type HrDepartmentBreakdown = {
+  department: string;
+  employees: number;
+  internalEnrollments: number;
+  completedInternal: number;
+  externalRequests: number;
+  activeRoutes: number;
+  completedRoutes: number;
+  certificates: number;
+  approvedBudget: number;
+};
+
+export type HrProviderBreakdown = {
+  providerName: string;
+  requests: number;
+  pending: number;
+  approved: number;
+  completed: number;
+  approvedBudget: number;
+};
+
+export type HrTrendPoint = {
+  month: string;
+  planned: number;
+  approved: number;
+  completed: number;
+  rejected: number;
+  plannedBudget: number;
+  approvedBudget: number;
+};
+
+export type HrRecommendation = {
+  priority: 'high' | 'medium' | 'low';
+  score: number;
+  title: string;
+  description: string;
+};
+
+export type HrWorkspaceAnalytics = {
+  overview: AnalyticsOverview;
+  roleCoverage: {
+    employees: number;
+    managers: number;
+    trainers: number;
+    hrAdmins: number;
+  };
+  coursePortfolio: CoursesAnalytics & {
+    upcomingSessions: number;
+    coveragePercent: number;
+    recentCourses: Array<{
+      id: string;
+      title: string;
+      type: CourseType;
+      format: CourseFormat;
+      status: CourseStatus;
+      durationHours: number | null;
+      enrollments: number;
+    }>;
+  };
+  externalLearning: ExternalLearningAnalytics & {
+    totalRequests: number;
+    pendingManager: number;
+    pendingHr: number;
+    averageManagerDecisionHours: number;
+    averageHrDecisionHours: number;
+    providerBreakdown: HrProviderBreakdown[];
+    departmentBreakdown: HrDepartmentBreakdown[];
+    monthlyTrend: HrTrendPoint[];
+    recentRequests: Array<{
+      id: string;
+      title: string;
+      providerName: string | null;
+      status: ExternalLearningStatus;
+      currentStage: ApprovalStage | null;
+      cost: number;
+      currency: string;
+      startAt: string;
+      endAt: string;
+      employee: BasicUser;
+      calendarConflict: boolean;
+    }>;
+  };
+  approvals: {
+    pendingCount: number;
+    urgentCount: number;
+    queue: Array<{
+      id: string;
+      requestId: string;
+      title: string;
+      employee: BasicUser;
+      cost: number;
+      currency: string;
+      startAt: string;
+      stage: ApprovalStage;
+      createdAt: string;
+    }>;
+  };
+  certificates: {
+    uploaded: number;
+    accepted: number;
+    rejected: number;
+    acceptanceRate: number;
+    averageVerificationHours: number;
+    urgentCount: number;
+    pending: Array<{
+      id: string;
+      fileName: string;
+      uploadedAt: string;
+      owner: BasicUser;
+      request: {
+        id: string;
+        title: string;
+        startAt: string;
+        endAt: string;
+      } | null;
+    }>;
+    recentDecisions: Array<{
+      id: string;
+      fileName: string;
+      status: CertificateStatus;
+      verifiedAt: string | null;
+      owner: BasicUser;
+      request: {
+        id: string;
+        title: string;
+        startAt: string;
+        endAt: string;
+      } | null;
+    }>;
+  };
+  people: {
+    topActiveEmployees: Array<{
+      employeeId: string;
+      fullName: string;
+      department: string | null;
+      internalEnrollments: number;
+      activeRoutes: number;
+      completedRoutes: number;
+      certificates: number;
+    }>;
+  };
+  notifications: {
+    unreadCount: number;
+    items: NotificationRecord[];
+  };
+  recommendations: HrRecommendation[];
 };
 
 export type TeamOverview = {
@@ -228,10 +399,43 @@ export type TeamOverview = {
 
 export type LearningSummaryReport = {
   overview: AnalyticsOverview;
-  courses: CoursesAnalytics;
+  roleCoverage: HrWorkspaceAnalytics['roleCoverage'];
+  courses: HrWorkspaceAnalytics['coursePortfolio'];
+  departments: HrDepartmentBreakdown[];
+  people: HrWorkspaceAnalytics['people'];
+  recommendations: HrRecommendation[];
 };
 
-export type ExternalLearningSummaryReport = ExternalLearningAnalytics;
+export type ExternalLearningSummaryReport = {
+  byStatus: ExternalLearningAnalytics['byStatus'];
+  totalRequests: number;
+  requestedBudget: number;
+  approvedBudget: number;
+  inReviewBudget: number;
+  rejectedBudget: number;
+  completionRate: number;
+  calendarConflicts: number;
+  pendingManager: number;
+  pendingHr: number;
+  averageManagerDecisionHours: number;
+  averageHrDecisionHours: number;
+  providerBreakdown: HrProviderBreakdown[];
+  departmentBreakdown: HrDepartmentBreakdown[];
+  monthlyTrend: HrTrendPoint[];
+  approvals: HrWorkspaceAnalytics['approvals'];
+  certificates: Omit<HrWorkspaceAnalytics['certificates'], 'pending' | 'recentDecisions'>;
+  recommendations: HrRecommendation[];
+};
+
+export type ExportReportPayload = {
+  reportType: 'learning-summary' | 'external-learning-summary';
+  format?: 'json' | 'csv';
+};
+
+export type ExportReportResponse = {
+  format: 'json' | 'csv';
+  data: unknown;
+};
 
 export type CreateUserPayload = {
   email: string;
@@ -572,6 +776,13 @@ export function getMyExternalLearningRequests(accessToken: string) {
   });
 }
 
+export function getExternalLearningRequests(accessToken: string) {
+  return apiRequest<ExternalLearningRequestRecord[]>('/external-learning/requests', {
+    accessToken,
+    method: 'GET',
+  });
+}
+
 export function createExternalLearningRequest(
   accessToken: string,
   payload: CreateExternalLearningRequestPayload,
@@ -640,6 +851,19 @@ export function getMyCertificates(accessToken: string) {
   });
 }
 
+export function getCertificates(
+  accessToken: string,
+  query: {
+    status?: CertificateStatus;
+  } = {},
+) {
+  return apiRequest<CertificateRecord[]>('/certificates', {
+    accessToken,
+    method: 'GET',
+    query,
+  });
+}
+
 export function uploadCertificate(
   accessToken: string,
   payload: {
@@ -663,6 +887,13 @@ export function uploadCertificate(
 
 export function verifyCertificate(accessToken: string, id: string) {
   return apiRequest<CertificateRecord>(`/certificates/${id}/verify`, {
+    accessToken,
+    method: 'PATCH',
+  });
+}
+
+export function rejectCertificate(accessToken: string, id: string) {
+  return apiRequest<CertificateRecord>(`/certificates/${id}/reject`, {
     accessToken,
     method: 'PATCH',
   });
@@ -696,6 +927,13 @@ export function getAnalyticsTeamOverview(accessToken: string) {
   });
 }
 
+export function getAnalyticsHrWorkspace(accessToken: string) {
+  return apiRequest<HrWorkspaceAnalytics>('/analytics/hr-workspace', {
+    accessToken,
+    method: 'GET',
+  });
+}
+
 export function getLearningSummaryReport(accessToken: string) {
   return apiRequest<LearningSummaryReport>('/reports/learning-summary', {
     accessToken,
@@ -707,5 +945,13 @@ export function getExternalLearningSummaryReport(accessToken: string) {
   return apiRequest<ExternalLearningSummaryReport>('/reports/external-learning-summary', {
     accessToken,
     method: 'GET',
+  });
+}
+
+export function exportReport(accessToken: string, payload: ExportReportPayload) {
+  return apiRequest<ExportReportResponse>('/reports/export', {
+    accessToken,
+    method: 'POST',
+    body: payload,
   });
 }

@@ -14,6 +14,7 @@ import { Textarea } from '@/components/ui/textarea';
 import {
   createCourse,
   CreateCoursePayload,
+  enrollCourse,
   getMyCourses,
   getUsers,
   publishCourse,
@@ -21,6 +22,7 @@ import {
 import {
   formatCourseFormat,
   formatCourseType,
+  formatRoleCode,
   getCourseStatusMeta,
 } from '@/lib/presentation';
 
@@ -37,6 +39,7 @@ export default function HrCoursesPage() {
   const queryClient = useQueryClient();
   const { accessToken } = useAuth();
   const [formState, setFormState] = useState<CreateCoursePayload>(initialValues);
+  const [assigneeByCourse, setAssigneeByCourse] = useState<Record<string, string>>({});
 
   const coursesQuery = useQuery({
     queryKey: ['hr-courses', accessToken],
@@ -47,10 +50,7 @@ export default function HrCoursesPage() {
         getUsers(accessToken as string),
       ]);
 
-      return {
-        courses,
-        trainers: users.filter((user) => user.roles.includes('INTERNAL_TRAINER')),
-      };
+      return { courses, users };
     },
   });
 
@@ -71,8 +71,10 @@ export default function HrCoursesPage() {
     },
     onSuccess: async () => {
       setFormState(initialValues);
-      await queryClient.invalidateQueries({ queryKey: ['hr-courses'] });
-      await queryClient.invalidateQueries({ queryKey: ['hr-dashboard'] });
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['hr-courses'] }),
+        queryClient.invalidateQueries({ queryKey: ['hr-dashboard'] }),
+      ]);
     },
   });
 
@@ -85,11 +87,43 @@ export default function HrCoursesPage() {
       return publishCourse(accessToken, courseId);
     },
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['hr-courses'] });
-      await queryClient.invalidateQueries({ queryKey: ['employee-courses'] });
-      await queryClient.invalidateQueries({ queryKey: ['employee-dashboard'] });
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['hr-courses'] }),
+        queryClient.invalidateQueries({ queryKey: ['employee-courses'] }),
+        queryClient.invalidateQueries({ queryKey: ['employee-dashboard'] }),
+        queryClient.invalidateQueries({ queryKey: ['hr-dashboard'] }),
+        queryClient.invalidateQueries({ queryKey: ['workspace-search'] }),
+      ]);
     },
   });
+
+  const assignMutation = useMutation({
+    mutationFn: async ({
+      courseId,
+      userId,
+    }: {
+      courseId: string;
+      userId: string;
+    }) => {
+      if (!accessToken) {
+        throw new Error('Сессия ещё не готова');
+      }
+
+      return enrollCourse(accessToken, courseId, { userId });
+    },
+    onSuccess: async (_, variables) => {
+      setAssigneeByCourse((current) => ({ ...current, [variables.courseId]: '' }));
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['hr-courses'] }),
+        queryClient.invalidateQueries({ queryKey: ['hr-dashboard'] }),
+        queryClient.invalidateQueries({ queryKey: ['employee-courses'] }),
+        queryClient.invalidateQueries({ queryKey: ['employee-dashboard'] }),
+      ]);
+    },
+  });
+
+  const createError = createCourseMutation.error?.message;
+  const assignError = assignMutation.error?.message;
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -99,28 +133,53 @@ export default function HrCoursesPage() {
   if (coursesQuery.isPending || !coursesQuery.data) {
     return (
       <EmptyState
-        title="Загружаем курсы"
-        description="Поднимаем курсы кадровой службы и список доступных внутренних тренеров."
+        title="Собираем каталог обучения"
+        description="Подгружаем курсы, тренеров и сотрудников для назначения обучения."
       />
     );
   }
 
-  const { courses, trainers } = coursesQuery.data;
+  const { courses, users } = coursesQuery.data;
+  const trainers = users.filter((user) => user.roles.includes('INTERNAL_TRAINER'));
+  const employees = users.filter((user) => user.roles.includes('EMPLOYEE'));
+  const publishedCourses = courses.filter((course) => course.status === 'PUBLISHED');
+  const summary = {
+    courses: courses.length,
+    published: publishedCourses.length,
+    learners: courses.reduce((total, course) => total + (course._count?.enrollments ?? 0), 0),
+  };
 
   return (
     <div className="space-y-6">
+      <section className="grid gap-4 md:grid-cols-3">
+        <SummaryCard label="Курсы кадровой службы" value={String(summary.courses)} />
+        <SummaryCard label="Опубликовано" value={String(summary.published)} />
+        <SummaryCard label="Назначений на обучение" value={String(summary.learners)} />
+      </section>
+
       <SectionCard
         title="Создать курс"
-        description="Кадровая служба создаёт курс, после публикации он сразу становится доступен сотрудникам."
+        description="Новый курс можно сразу подготовить, назначить тренера и затем открыть сотрудникам после публикации."
       >
         <form className="grid gap-5 md:grid-cols-2" onSubmit={handleSubmit}>
           <FormField label="Название курса">
-            <Input value={formState.title} onChange={(event) => setFormState((current) => ({ ...current, title: event.target.value }))} required />
+            <Input
+              value={formState.title}
+              onChange={(event) =>
+                setFormState((current) => ({ ...current, title: event.target.value }))
+              }
+              required
+            />
           </FormField>
-          <FormField label="Тип">
+          <FormField label="Тип обучения">
             <select
               value={formState.type}
-              onChange={(event) => setFormState((current) => ({ ...current, type: event.target.value as CreateCoursePayload['type'] }))}
+              onChange={(event) =>
+                setFormState((current) => ({
+                  ...current,
+                  type: event.target.value as CreateCoursePayload['type'],
+                }))
+              }
               className="mt-2 flex h-11 w-full rounded-2xl border border-border bg-panel px-4 text-sm text-foreground outline-none transition-colors focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/15"
             >
               <option value="LMS">LMS</option>
@@ -130,7 +189,12 @@ export default function HrCoursesPage() {
           <FormField label="Формат">
             <select
               value={formState.format}
-              onChange={(event) => setFormState((current) => ({ ...current, format: event.target.value as CreateCoursePayload['format'] }))}
+              onChange={(event) =>
+                setFormState((current) => ({
+                  ...current,
+                  format: event.target.value as CreateCoursePayload['format'],
+                }))
+              }
               className="mt-2 flex h-11 w-full rounded-2xl border border-border bg-panel px-4 text-sm text-foreground outline-none transition-colors focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/15"
             >
               <option value="LIVE">Очный</option>
@@ -143,16 +207,26 @@ export default function HrCoursesPage() {
               type="number"
               min="1"
               value={formState.durationHours ?? ''}
-              onChange={(event) => setFormState((current) => ({ ...current, durationHours: Number(event.target.value) }))}
+              onChange={(event) =>
+                setFormState((current) => ({
+                  ...current,
+                  durationHours: Number(event.target.value),
+                }))
+              }
             />
           </FormField>
-          <FormField label="Тренер" className="md:col-span-2">
+          <FormField label="Внутренний тренер" className="md:col-span-2">
             <select
               value={formState.trainerId ?? ''}
-              onChange={(event) => setFormState((current) => ({ ...current, trainerId: event.target.value || undefined }))}
+              onChange={(event) =>
+                setFormState((current) => ({
+                  ...current,
+                  trainerId: event.target.value || undefined,
+                }))
+              }
               className="mt-2 flex h-11 w-full rounded-2xl border border-border bg-panel px-4 text-sm text-foreground outline-none transition-colors focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/15"
             >
-              <option value="">Не назначать</option>
+              <option value="">Пока без назначения</option>
               {trainers.map((trainer) => (
                 <option key={trainer.id} value={trainer.id}>
                   {trainer.firstName} {trainer.lastName}
@@ -161,52 +235,116 @@ export default function HrCoursesPage() {
             </select>
           </FormField>
           <FormField label="Описание" className="md:col-span-2">
-            <Textarea value={formState.description} onChange={(event) => setFormState((current) => ({ ...current, description: event.target.value }))} />
+            <Textarea
+              value={formState.description}
+              onChange={(event) =>
+                setFormState((current) => ({ ...current, description: event.target.value }))
+              }
+            />
           </FormField>
           <div className="md:col-span-2">
             <PrimaryButton type="submit" disabled={createCourseMutation.isPending}>
-              {createCourseMutation.isPending ? 'Создаём...' : 'Создать курс'}
+              {createCourseMutation.isPending ? 'Сохраняем курс...' : 'Создать курс'}
             </PrimaryButton>
           </div>
         </form>
 
-        {createCourseMutation.error ? (
+        {createError ? (
           <div className="mt-5 rounded-[24px] border border-danger/20 bg-danger-soft/60 px-5 py-4 text-sm text-danger">
-            {createCourseMutation.error.message}
+            {createError}
           </div>
         ) : null}
       </SectionCard>
 
       <SectionCard
-        title="Мои курсы"
-        description="После публикации сотрудники увидят LMS-курс в своём каталоге и смогут записаться."
+        title="Каталог кадровой службы"
+        description="Здесь видно, какие программы уже опубликованы и кого можно назначить на обучение."
       >
         <div className="space-y-3">
           {courses.length ? (
             courses.map((course) => {
               const statusMeta = getCourseStatusMeta(course.status);
+              const trainerLabel = course.trainer
+                ? `${course.trainer.firstName} ${course.trainer.lastName}`
+                : 'Тренер не назначен';
 
               return (
-                <div key={course.id} className="rounded-[24px] border border-border bg-panel-subtle p-5">
-                  <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
-                    <div>
-                      <div className="flex flex-wrap items-center gap-3">
-                        <p className="text-base font-semibold text-foreground">{course.title}</p>
-                        <StatusBadge tone={statusMeta.tone}>{statusMeta.label}</StatusBadge>
+                <div
+                  key={course.id}
+                  className="rounded-[24px] border border-border bg-panel-subtle p-5"
+                >
+                  <div className="flex flex-col gap-5">
+                    <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
+                      <div>
+                        <div className="flex flex-wrap items-center gap-3">
+                          <p className="text-base font-semibold text-foreground">{course.title}</p>
+                          <StatusBadge tone={statusMeta.tone}>{statusMeta.label}</StatusBadge>
+                        </div>
+                        <p className="mt-2 text-sm text-muted">
+                          {formatCourseType(course.type)} · {formatCourseFormat(course.format)} ·{' '}
+                          {course._count?.enrollments ?? 0} назначений
+                        </p>
+                        <p className="mt-2 text-sm text-muted">{trainerLabel}</p>
+                        <p className="mt-2 text-sm leading-6 text-muted">
+                          {course.description ?? 'Описание курса пока не заполнено.'}
+                        </p>
                       </div>
-                      <p className="mt-2 text-sm text-muted">
-                        {formatCourseType(course.type)} · {formatCourseFormat(course.format)} · {course._count?.enrollments ?? 0} learners
-                      </p>
-                      <p className="mt-2 text-sm leading-6 text-muted">{course.description ?? 'Описание не заполнено'}</p>
+
+                      <div className="flex flex-wrap gap-2">
+                        {course.trainer ? (
+                          <StatusBadge tone="info">
+                            {formatRoleCode('INTERNAL_TRAINER')} · {trainerLabel}
+                          </StatusBadge>
+                        ) : null}
+                        {course.status === 'DRAFT' ? (
+                          <PrimaryButton
+                            type="button"
+                            disabled={publishMutation.isPending}
+                            onClick={() => publishMutation.mutate(course.id)}
+                          >
+                            Опубликовать
+                          </PrimaryButton>
+                        ) : null}
+                      </div>
                     </div>
-                    {course.status === 'DRAFT' ? (
-                      <PrimaryButton
-                        type="button"
-                        disabled={publishMutation.isPending}
-                        onClick={() => publishMutation.mutate(course.id)}
-                      >
-                        Опубликовать
-                      </PrimaryButton>
+
+                    {course.status === 'PUBLISHED' ? (
+                      <div className="grid gap-4 rounded-[24px] border border-border bg-panel px-4 py-4 lg:grid-cols-[1fr_auto] lg:items-end">
+                        <div>
+                          <Label>Назначить сотрудника</Label>
+                          <select
+                            value={assigneeByCourse[course.id] ?? ''}
+                            onChange={(event) =>
+                              setAssigneeByCourse((current) => ({
+                                ...current,
+                                [course.id]: event.target.value,
+                              }))
+                            }
+                            className="mt-2 flex h-11 w-full rounded-2xl border border-border bg-panel-subtle px-4 text-sm text-foreground outline-none transition-colors focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/15"
+                          >
+                            <option value="">Выберите сотрудника</option>
+                            {employees.map((employee) => (
+                              <option key={employee.id} value={employee.id}>
+                                {employee.firstName} {employee.lastName}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                        <PrimaryButton
+                          type="button"
+                          disabled={
+                            assignMutation.isPending || !assigneeByCourse[course.id]
+                          }
+                          onClick={() =>
+                            assignMutation.mutate({
+                              courseId: course.id,
+                              userId: assigneeByCourse[course.id],
+                            })
+                          }
+                        >
+                          Назначить обучение
+                        </PrimaryButton>
+                      </div>
                     ) : null}
                   </div>
                 </div>
@@ -214,12 +352,34 @@ export default function HrCoursesPage() {
             })
           ) : (
             <EmptyState
-              title="Курсы кадровой службы ещё не созданы"
-              description="Создайте первый курс выше, и он сразу появится в каталоге сотрудников."
+              title="Каталог пока пуст"
+              description="Создайте первый курс, и он сразу появится в рабочем списке кадровой службы."
             />
           )}
         </div>
+
+        {assignError ? (
+          <div className="mt-5 rounded-[24px] border border-danger/20 bg-danger-soft/60 px-5 py-4 text-sm text-danger">
+            {assignError}
+          </div>
+        ) : null}
       </SectionCard>
+    </div>
+  );
+}
+
+function SummaryCard({
+  label,
+  value,
+}: {
+  label: string;
+  value: string;
+}) {
+  return (
+    <div className="rounded-[24px] border border-border bg-panel p-5">
+      <div className="alrosa-rule mb-4" />
+      <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted">{label}</p>
+      <p className="mt-3 text-3xl font-semibold text-foreground">{value}</p>
     </div>
   );
 }

@@ -21,7 +21,7 @@ export function Sidebar() {
       <div className="mb-8 rounded-[28px] border border-border bg-panel px-5 py-5">
         <div className="alrosa-rule mb-4" />
         <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-muted">
-          ALROSA IT
+          АЛРОСА ИТ
         </p>
         <h1 className="mt-3 text-[1.7rem] font-semibold tracking-tight text-foreground">
           Контур развития

@@ -5,11 +5,12 @@ import { usePathname } from 'next/navigation';
 
 import { useAuth } from '@/components/providers/auth-provider';
 import { buttonVariants } from '@/components/ui/button';
-import { SearchInput } from '@/components/ui/search-input';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { cn } from '@/lib/cn';
 import { resolvePageMeta } from '@/lib/navigation';
 import { getUserDisplayName, getUserMetaLine } from '@/lib/user-display';
+
+import { WorkspaceSearch } from './workspace-search';
 
 export function Header() {
   const pathname = usePathname();
@@ -24,7 +25,7 @@ export function Header() {
         <div className="max-w-3xl">
           <div className="mb-4 flex items-center gap-3">
             <div className="alrosa-rule shrink-0" />
-            <StatusBadge tone="info">Единый контур обучения ALROSA IT</StatusBadge>
+            <StatusBadge tone="info">Единый контур обучения АЛРОСА ИТ</StatusBadge>
           </div>
           <p className="text-sm font-medium text-foreground">Здравствуйте, {displayName}</p>
           <h1 className="text-3xl font-semibold tracking-tight text-foreground sm:text-[2rem]">
@@ -35,7 +36,7 @@ export function Header() {
         </div>
 
         <div className="flex w-full flex-col gap-3 sm:flex-row xl:w-auto xl:items-center">
-          <SearchInput
+          <WorkspaceSearch
             className="min-w-0 sm:min-w-80 xl:min-w-[23rem]"
             placeholder="Поиск по курсам, заявкам и сертификатам"
           />

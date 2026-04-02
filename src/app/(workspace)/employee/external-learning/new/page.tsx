@@ -1,7 +1,7 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import { FormEvent, useMemo, useState } from 'react';
+import { FormEvent, useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 
@@ -33,6 +33,43 @@ const initialValues = {
   description: '',
 };
 
+function toIsoDateTime(value: string, fieldLabel: string) {
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    throw new Error(`${fieldLabel} заполнена некорректно`);
+  }
+
+  return date.toISOString();
+}
+
+function buildPayload(formState: typeof initialValues) {
+  const cost = Number(formState.cost);
+
+  if (Number.isNaN(cost) || cost < 0) {
+    throw new Error('Стоимость указана некорректно');
+  }
+
+  const startAt = toIsoDateTime(formState.startAt, 'Дата начала');
+  const endAt = toIsoDateTime(formState.endAt, 'Дата окончания');
+
+  if (new Date(startAt).getTime() >= new Date(endAt).getTime()) {
+    throw new Error('Дата окончания должна быть позже даты начала');
+  }
+
+  return {
+    title: formState.title.trim(),
+    courseUrl: formState.courseUrl.trim(),
+    providerName: formState.providerName.trim() || undefined,
+    cost,
+    currency: formState.currency.trim() || 'RUB',
+    startAt,
+    endAt,
+    program: formState.program.trim() || undefined,
+    description: formState.description.trim() || undefined,
+  };
+}
+
 export default function EmployeeExternalLearningNewPage() {
   const router = useRouter();
   const queryClient = useQueryClient();
@@ -51,27 +88,13 @@ export default function EmployeeExternalLearningNewPage() {
     };
   } | null>(null);
 
-  const payload = useMemo(
-    () => ({
-      title: formState.title.trim(),
-      courseUrl: formState.courseUrl.trim(),
-      providerName: formState.providerName.trim() || undefined,
-      cost: Number(formState.cost),
-      currency: formState.currency.trim() || 'RUB',
-      startAt: new Date(formState.startAt).toISOString(),
-      endAt: new Date(formState.endAt).toISOString(),
-      program: formState.program.trim() || undefined,
-      description: formState.description.trim() || undefined,
-    }),
-    [formState],
-  );
-
   const draftMutation = useMutation({
     mutationFn: async (shouldSubmit: boolean) => {
       if (!accessToken) {
         throw new Error('Сессия ещё не готова');
       }
 
+      const payload = buildPayload(formState);
       const created = await createExternalLearningRequest(accessToken, payload);
 
       if (!shouldSubmit) {
